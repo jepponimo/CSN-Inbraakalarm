@@ -186,3 +186,5 @@ while True: # Geeft een reactie per 1 seconde
         elif (GPIO.input(GPIOKnopStop) == 1):
             GPIO.output(GPIOLamp,GPIO.LOW)
             KnopStart = 0
+        else:
+            pass
