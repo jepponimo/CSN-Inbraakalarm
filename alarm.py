@@ -1,8 +1,16 @@
 import time
 from tkinter import *
 import sqlite3
-
 import RPi.GPIO as GPIO
+
+global GPIOLamp
+GPIOLamp = 7
+
+global GPIOKnopStart
+GPIOKnopStart = 9
+
+global GPIOKnopStop
+GPIOKnopStop = 8
 
 # SQL
 databasename = 'alarm.db'
@@ -75,8 +83,7 @@ def lampAan(tijd_interval):
     import time
     if isInt(tijd_interval) == True:
         time.sleep(tijd_interval)
-        print('Lamp Aan')
-        GPIO.output(3,GPIO.HIGH)
+        GPIO.output(GPIOLamp,GPIO.HIGH)
         return True
     else:
         return False
@@ -85,8 +92,7 @@ def lampUit(tijd_interval):
     import time
     if isInt(tijd_interval) == True:
         time.sleep(tijd_interval)
-        print('Lamp Uit')
-        GPIO.output(3,GPIO.LOW)
+        GPIO.output(GPIOLamp,GPIO.LOW)
         return True
     else:
         return False
@@ -157,18 +163,26 @@ def loginGebruiker():
         print('Uw gegevens zijn onjuist')
 
 # Start the program
-GPIO.setmode(GPIO.BCM)
+GPIO.setmode(GPIO.BOARD)
 GPIO.setwarnings(False)
-GPIO.setup(3,GPIO.OUT)
+GPIO.setup(GPIOLamp,GPIO.OUT)
+GPIO.setup(GPIOKnopStart,GPIO.OUT)
+GPIO.setup(GPIOKnopStop,GPIO.OUT)
 
 startDatabase(databasename)
 showLoginMenu()
 
 var = 0
+KnopStart = 0
 
 while True: # Geeft een reactie per 1 seconde
     if var == 0:
-        root.mainloop()
+        #root.mainloop()
         var = 1
     else:
-        lampKnipper(1,3)
+        if (GPIO.input(GPIOKnopStart) == 1) or KnopStart == 1:
+            lampKnipper(1,1)
+            KnopStart = 1
+        elif (GPIO.input(GPIOKnopStop) == 1):
+            GPIO.output(GPIOLamp,GPIO.LOW)
+            KnopStart = 0
